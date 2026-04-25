@@ -105,14 +105,11 @@ function startQuestionTimer() {
 
 // Check the answer and update the score
 function checkAnswer(selectedOption) {
+    clearInterval(questionTimer); // Clear the timer
     const currentQuestion = questions[questionIndex];
     if (selectedOption === currentQuestion.correctAnswer) {
         alert('Correct!');
-        if (playerScores[currentPlayer]) {
-            playerScores[currentPlayer] += 1;
-        } else {
-            playerScores[currentPlayer] = 1;
-        }
+        playerScores[currentPlayer] = (playerScores[currentPlayer] || 0) + 1;
     } else {
         alert('Wrong answer!');
     }
@@ -126,6 +123,11 @@ function checkAnswer(selectedOption) {
 function updateScoreboard() {
     const playersScoresContainer = document.getElementById('players-scores');
     playersScoresContainer.innerHTML = '';  // Clear previous scoreboard
+
+    // Ensure current player is in scores
+    if (!playerScores[currentPlayer]) {
+        playerScores[currentPlayer] = 0;
+    }
 
     Object.keys(playerScores).forEach(player => {
         const li = document.createElement('li');
