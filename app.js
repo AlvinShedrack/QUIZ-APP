@@ -6,6 +6,14 @@ let questionTimer;  // Timer for question display
 // Questions for the quiz
 let questions = [];
 
+// Show message function
+function showMessage(text, duration = 2000) {
+    const message = document.getElementById('message');
+    message.textContent = text;
+    message.style.display = 'block';
+    setTimeout(() => message.style.display = 'none', duration);
+}
+
 // Fetch questions from online API
 async function fetchQuestions() {
     try {
@@ -39,12 +47,33 @@ async function fetchQuestions() {
     }
 }
 
+// Add player
+document.getElementById('add-player').addEventListener('click', function () {
+    const name = document.getElementById('player-name').value.trim();
+    if (!name) {
+        showMessage("Please enter a name.");
+        return;
+    }
+    if (playerScores[name]) {
+        showMessage("Player already added.");
+        return;
+    }
+    playerScores[name] = 0;
+    updateScoreboard();
+    document.getElementById('player-name').value = '';
+    document.getElementById('start-quiz').style.display = 'inline-block';
+});
+
 // Start the quiz after entering name
 document.getElementById('start-quiz').addEventListener('click', async function () {
-    currentPlayer = document.getElementById('player-name').value.trim();
-    if (!currentPlayer) {
-        alert("Please enter your name to start.");
+    const name = document.getElementById('player-name').value.trim();
+    if (!name) {
+        showMessage("Please enter your name to start.");
         return;
+    }
+    currentPlayer = name;
+    if (!playerScores[currentPlayer]) {
+        playerScores[currentPlayer] = 0;
     }
 
     // Fetch questions
@@ -62,7 +91,7 @@ document.getElementById('start-quiz').addEventListener('click', async function (
 function loadNextQuestion() {
     if (questionIndex < questions.length) {
         const currentQuestion = questions[questionIndex];
-        document.getElementById('question').textContent = currentQuestion.question;
+        document.getElementById('question').textContent = `Question ${questionIndex + 1}: ${currentQuestion.question}`;
 
         const optionsContainer = document.getElementById('options');
         optionsContainer.innerHTML = '';  // Clear previous options
@@ -95,10 +124,12 @@ function startQuestionTimer() {
 
         if (timeLeft <= 0) {
             clearInterval(questionTimer);
-            alert("Time's up!");
-            questionIndex++;
-            loadNextQuestion();
-            updateScoreboard();
+            showMessage("Time's up!", 1000);
+            setTimeout(() => {
+                questionIndex++;
+                loadNextQuestion();
+                updateScoreboard();
+            }, 1000);
         }
     }, 1000);
 }
@@ -108,10 +139,10 @@ function checkAnswer(selectedOption) {
     clearInterval(questionTimer); // Clear the timer
     const currentQuestion = questions[questionIndex];
     if (selectedOption === currentQuestion.correctAnswer) {
-        alert('Correct!');
+        showMessage('Correct!');
         playerScores[currentPlayer] = (playerScores[currentPlayer] || 0) + 1;
     } else {
-        alert('Wrong answer!');
+        showMessage('Wrong answer!');
     }
 
     questionIndex++;
