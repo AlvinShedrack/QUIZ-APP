@@ -9,28 +9,29 @@
 <body>
     <div class="container">
         <h1>Online Quiz</h1>
-        <div id="quiz-container">
+
+        <div id="player-entry">
+            <h2>Enter your Name</h2>
+            <input type="text" id="player-name" placeholder="Your name">
+            <button id="start-quiz">Start Quiz</button>
+        </div>
+
+        <div id="quiz-container" style="display: none;">
             <div id="question-container">
                 <p id="question"></p>
                 <div id="options"></div>
             </div>
 
             <div id="score-board">
-                <h2>Scoreboard</h2>
+                <h2>Player Dashboard</h2>
                 <ul id="players-scores">
                     <!-- Player scores will appear here -->
                 </ul>
             </div>
-
-            <div id="waiting">
-                <p>Next question will load in <span id="timer">10</span> seconds...</p>
-            </div>
         </div>
 
-        <div id="player-entry">
-            <h2>Enter your Name</h2>
-            <input type="text" id="player-name" placeholder="Your name">
-            <button id="start-quiz">Start Quiz</button>
+        <div id="waiting" style="display: none;">
+            <p>Next question will load in <span id="timer">10</span> seconds...</p>
         </div>
     </div>
 

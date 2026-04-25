@@ -112,7 +112,7 @@ function updateScoreboard() {
     });
 }
 
-// End the quiz
+// End the quiz and display the final scores
 function endQuiz() {
     alert("The quiz is over!");
     document.getElementById('quiz-container').style.display = 'none';
