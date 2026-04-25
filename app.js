@@ -4,32 +4,51 @@ let questionIndex = 0;  // Track current question
 let questionTimer;  // Timer for question display
 
 // Questions for the quiz
-const questions = [
-    {
-        question: "What is the capital of France?",
-        options: ["Berlin", "Madrid", "Paris", "Lisbon"],
-        correctAnswer: "Paris"
-    },
-    {
-        question: "Which planet is known as the Red Planet?",
-        options: ["Earth", "Mars", "Jupiter", "Venus"],
-        correctAnswer: "Mars"
-    },
-    {
-        question: "What is the largest animal on Earth?",
-        options: ["Elephant", "Blue Whale", "Shark", "Giraffe"],
-        correctAnswer: "Blue Whale"
-    },
-    // Add more questions here
-];
+let questions = [];
+
+// Fetch questions from online API
+async function fetchQuestions() {
+    try {
+        const response = await fetch('https://opentdb.com/api.php?amount=10&type=multiple');
+        const data = await response.json();
+        questions = data.results.map(q => ({
+            question: q.question.replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'),
+            options: [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5),
+            correctAnswer: q.correct_answer
+        }));
+    } catch (error) {
+        console.error('Failed to fetch questions:', error);
+        // Fallback to hardcoded questions
+        questions = [
+            {
+                question: "What is the capital of France?",
+                options: ["Berlin", "Madrid", "Paris", "Lisbon"],
+                correctAnswer: "Paris"
+            },
+            {
+                question: "Which planet is known as the Red Planet?",
+                options: ["Earth", "Mars", "Jupiter", "Venus"],
+                correctAnswer: "Mars"
+            },
+            {
+                question: "What is the largest animal on Earth?",
+                options: ["Elephant", "Blue Whale", "Shark", "Giraffe"],
+                correctAnswer: "Blue Whale"
+            }
+        ];
+    }
+}
 
 // Start the quiz after entering name
-document.getElementById('start-quiz').addEventListener('click', function () {
+document.getElementById('start-quiz').addEventListener('click', async function () {
     currentPlayer = document.getElementById('player-name').value.trim();
     if (!currentPlayer) {
         alert("Please enter your name to start.");
         return;
     }
+
+    // Fetch questions
+    await fetchQuestions();
 
     // Hide player entry and show quiz container
     document.getElementById('player-entry').style.display = 'none';
@@ -68,15 +87,18 @@ function loadNextQuestion() {
 function startQuestionTimer() {
     let timeLeft = 10;  // 10 seconds for each question
     const timerElement = document.getElementById('timer');
-    timerElement.textContent = timeLeft;
+    timerElement.textContent = `Time left: ${timeLeft}`;
 
     questionTimer = setInterval(function () {
         timeLeft--;
-        timerElement.textContent = timeLeft;
+        timerElement.textContent = `Time left: ${timeLeft}`;
 
         if (timeLeft <= 0) {
             clearInterval(questionTimer);
+            alert("Time's up!");
+            questionIndex++;
             loadNextQuestion();
+            updateScoreboard();
         }
     }, 1000);
 }
@@ -114,7 +136,16 @@ function updateScoreboard() {
 
 // End the quiz and display the final scores
 function endQuiz() {
-    alert("The quiz is over!");
+    clearInterval(questionTimer); // Clear any running timer
     document.getElementById('quiz-container').style.display = 'none';
-    document.getElementById('player-entry').style.display = 'block';
+    document.getElementById('game-over').style.display = 'block';
+    document.getElementById('final-score').textContent = `Your final score: ${playerScores[currentPlayer] || 0} out of ${questions.length}`;
 }
+
+// Restart the quiz
+document.getElementById('restart-quiz').addEventListener('click', function () {
+    questionIndex = 0;
+    document.getElementById('game-over').style.display = 'none';
+    document.getElementById('player-entry').style.display = 'block';
+    // Optionally reset scores: playerScores = {};
+});

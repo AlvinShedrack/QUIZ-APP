@@ -20,6 +20,7 @@
             <div id="question-container">
                 <p id="question"></p>
                 <div id="options"></div>
+                <p id="timer">Time left: 10</p>
             </div>
 
             <div id="score-board">
@@ -30,8 +31,10 @@
             </div>
         </div>
 
-        <div id="waiting" style="display: none;">
-            <p>Next question will load in <span id="timer">10</span> seconds...</p>
+        <div id="game-over" style="display: none;">
+            <h2>Game Over!</h2>
+            <p id="final-score"></p>
+            <button id="restart-quiz">Play Again</button>
         </div>
     </div>
 
